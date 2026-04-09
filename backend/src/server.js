@@ -3,10 +3,12 @@ import ENV from '../lib/env.js'
 import path from 'path'
 import authRoutes from './routes/auth.route.js'
 import messageRoutes from './routes/message.route.js'
+import connectDB from '../lib/db.js'
 
 const app = express();
 const __dirname = path.resolve();
-console.log(__dirname)
+
+app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
@@ -19,4 +21,13 @@ if(ENV.NODE_ENV == "production"){
     })
 }
 
-app.listen(ENV.PORT, () => console.log(`Server is running on port ${ENV.PORT}`));
+const startServer = async () => {
+    try {
+        await connectDB();
+        app.listen(ENV.PORT, () => console.log(`Server is running on port ${ENV.PORT}`));
+    } catch (error) {
+        console.error("Error while starting the server", error);
+    }
+}
+
+startServer();
